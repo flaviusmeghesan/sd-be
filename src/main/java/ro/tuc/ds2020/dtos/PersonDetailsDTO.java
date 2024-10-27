@@ -15,23 +15,27 @@ public class PersonDetailsDTO {
     private String username;
     @NotNull
     private String password;
+    @NotNull
+    private UUID assigned_device_id;
 
     public PersonDetailsDTO() {
     }
 
-    public PersonDetailsDTO(UUID id, String name, String role, String username, String password) {
+    public PersonDetailsDTO(UUID id, String name, String role, String username, String password, UUID assigned_device_id) {
         this.id = id;
         this.name = name;
         this.role = role;
         this.username = username;
         this.password = password;
+        this.assigned_device_id = assigned_device_id;
     }
 
-    public PersonDetailsDTO(String name, String role, String username, String password) {
+    public PersonDetailsDTO(String name, String role, String username, String password, UUID assigned_device_id) {
         this.name = name;
         this.role = role;
         this.username = username;
         this.password = password;
+        this.assigned_device_id = assigned_device_id;
     }
 
     public UUID getId() {
@@ -73,4 +77,9 @@ public class PersonDetailsDTO {
     public void setPassword( String password) {
         this.password = password;
     }
+
+    public UUID getAssigned_device_id() {
+        return assigned_device_id;
+    }
+
 }

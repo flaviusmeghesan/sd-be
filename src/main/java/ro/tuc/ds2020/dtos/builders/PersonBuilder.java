@@ -10,7 +10,7 @@ public class PersonBuilder {
     }
 
     public static PersonDTO toPersonDTO(Person person) {
-        return new PersonDTO(person.getId(), person.getName(), person.getRole(), person.getUsername(), person.getPassword());
+        return new PersonDTO(person.getId(), person.getName(), person.getRole(), person.getUsername(), person.getPassword(), person.getAssigned_device_id());
     }
 
     public static Person toEntity(PersonDetailsDTO personDetailsDTO) {
@@ -19,6 +19,7 @@ public class PersonBuilder {
                 personDetailsDTO.getName(),
                 personDetailsDTO.getRole(),
                 personDetailsDTO.getUsername(),
-                personDetailsDTO.getPassword());
+                personDetailsDTO.getPassword(),
+                personDetailsDTO.getAssigned_device_id());
     }
 }

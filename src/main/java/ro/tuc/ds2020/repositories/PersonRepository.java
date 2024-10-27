@@ -14,7 +14,7 @@ public interface PersonRepository extends JpaRepository<Person, UUID> {
     /**
      * Example: JPA generate Query by Field
      */
-    List<Person> findByUsername(String username);
+    Optional<Person> findByUsername(String username);
 
     /**
      * Example: Write Custom Query

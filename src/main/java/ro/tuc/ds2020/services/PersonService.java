@@ -71,4 +71,19 @@ public class PersonService {
         LOGGER.debug("Person with id {} was updated in db", id);
         return person.getId();
     }
+
+    public Optional<PersonDTO> authenticate(String username, String password) {
+        Optional<Person> personOptional = personRepository.findByUsername(username);
+        return personOptional
+                .filter(person -> person.getPassword().equals(password))
+                .map(PersonBuilder::toPersonDTO);
+    }
+
+    public void assignDeviceToUser(UUID userId, UUID deviceId) {
+        Person person = personRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        person.setAssigned_device_id(deviceId);
+        personRepository.save(person);
+    }
+
 }

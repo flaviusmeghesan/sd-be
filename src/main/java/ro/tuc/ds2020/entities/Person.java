@@ -32,19 +32,17 @@ public class Person  implements Serializable{
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "assigned_device_id", nullable = true)
-    private UUID assigned_device_id;
 
     public Person() {
     }
 
-    public Person(UUID id, String name, String role, String username, String password, UUID assigned_device_id) {
+    public Person(UUID id, String name, String role, String username, String password) {
         this.id = id;
         this.name = name;
         this.role = role;
         this.username = username;
         this.password = password;
-        this.assigned_device_id = assigned_device_id;
+
     }
 
     public UUID getId() {
@@ -87,11 +85,4 @@ public class Person  implements Serializable{
         this.role = role;
     }
 
-    public UUID getAssigned_device_id() {
-        return assigned_device_id;
-    }
-
-    public void setAssigned_device_id(UUID assigned_device_id) {
-        this.assigned_device_id = assigned_device_id;
-    }
 }

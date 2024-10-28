@@ -124,9 +124,6 @@ public class PersonController {
 
         // Check if the user has an assigned device
         PersonDTO person = personService.findPersonById(personId);
-        if (person.getAssigned_device_id() != null) {
-            return new ResponseEntity<>("Cannot delete user. The user has an assigned device.", HttpStatus.BAD_REQUEST);
-        }
 
         personService.delete(personId);
         return new ResponseEntity<>("Person with id " + personId + " was deleted!", HttpStatus.OK);
@@ -153,19 +150,5 @@ public class PersonController {
         return new ResponseEntity<>(person, HttpStatus.OK);
     }
 
-    @PutMapping("/{userId}/assignDevice/{deviceId}")
-    public ResponseEntity<String> assignDeviceToUser(@PathVariable("userId") UUID userId, @PathVariable("deviceId") UUID deviceId, HttpServletRequest request) {
-        if (!isAdmin(request)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        try {
-            personService.assignDeviceToUser(userId, deviceId);
-            return new ResponseEntity<>("Device assigned to user successfully in User Microservice.", HttpStatus.OK);
-        } catch (Exception e) {
-            LOGGER.error("Error updating user's assigned device: {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 }

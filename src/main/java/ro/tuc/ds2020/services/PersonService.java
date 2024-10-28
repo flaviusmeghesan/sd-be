@@ -3,7 +3,9 @@ package ro.tuc.ds2020.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ro.tuc.ds2020.controllers.handlers.exceptions.model.ResourceNotFoundException;
 import ro.tuc.ds2020.dtos.PersonDTO;
 import ro.tuc.ds2020.dtos.PersonDetailsDTO;
@@ -21,10 +23,14 @@ import java.util.stream.Collectors;
 public class PersonService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonService.class);
     private final PersonRepository personRepository;
+    private final RestTemplate restTemplate; // For HTTP calls to the device microservice
 
+    @Value("${device.microservice.url}")
+    private String deviceMicroserviceUrl;
     @Autowired
-    public PersonService(PersonRepository personRepository) {
+    public PersonService(PersonRepository personRepository, RestTemplate restTemplate) {
         this.personRepository = personRepository;
+        this.restTemplate = restTemplate;
     }
 
     public List<PersonDTO> findPersons() {
@@ -43,14 +49,28 @@ public class PersonService {
         return PersonBuilder.toPersonDTO(prosumerOptional.get());
     }
 
-    // create the delete method
     public void delete(UUID id) {
         Optional<Person> personOptional = personRepository.findById(id);
         if (!personOptional.isPresent()) {
             LOGGER.error("Person with id {} was not found in db", id);
             throw new ResourceNotFoundException(Person.class.getSimpleName() + " with id: " + id);
         }
+
+        // Call device microservice to check for mappings
+        if (hasAssignedDevices(id)) {
+            LOGGER.error("Person with id {} has assigned devices and cannot be deleted", id);
+            throw new IllegalStateException("Cannot delete person with id " + id + " because they are assigned to one or more devices.");
+        }
+
         personRepository.deleteById(id);
+        LOGGER.info("Person with id {} was deleted successfully", id);
+    }
+
+    // Helper method to check if user has assigned devices
+    private boolean hasAssignedDevices(UUID userId) {
+        String url = deviceMicroserviceUrl + "/mappings/user/" + userId;
+        Boolean hasMappings = restTemplate.getForObject(url, Boolean.class);
+        return Boolean.TRUE.equals(hasMappings); // Return true if mappings exist
     }
     public UUID insert(PersonDetailsDTO personDTO) {
         Person person = PersonBuilder.toEntity(personDTO);
@@ -79,11 +99,5 @@ public class PersonService {
                 .map(PersonBuilder::toPersonDTO);
     }
 
-    public void assignDeviceToUser(UUID userId, UUID deviceId) {
-        Person person = personRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        person.setAssigned_device_id(deviceId);
-        personRepository.save(person);
-    }
 
 }
